@@ -6880,10 +6880,10 @@ define pcodeop phsubsw;
 :PHSUBSW       XmmReg1, XmmReg2 is vexMode=0 &  $(PRE_66) & byte=0x0F; byte=0x38; byte=0x07; xmmmod = 3 & XmmReg1 & XmmReg2 { XmmReg1=phsubsw(XmmReg1,XmmReg2); }
 
 define pcodeop pinsrw;
-:PINSRW        mmxreg, r32, imm8 is vexMode=0 &  mandover=0 & byte=0x0F; byte=0xC4; mmxmod=3 & r32 & mmxreg; imm8 { mmxreg = pinsrw(mmxreg, r32, imm8:8); }
-:PINSRW        mmxreg, m16, imm8 is vexMode=0 &  mandover=0 & byte=0x0F; byte=0xC4; m16 & mmxreg ... ; imm8 { mmxreg = pinsrw(mmxreg, m16, imm8:8); }
-:PINSRW        XmmReg, r32, imm8 is vexMode=0 &  $(PRE_66) & byte=0x0F; byte=0xC4; xmmmod=3 & r32 & XmmReg; imm8 { XmmReg = pinsrw(XmmReg, r32, imm8:8); }
-:PINSRW        XmmReg, m16, imm8 is vexMode=0 &  $(PRE_66) & byte=0x0F; byte=0xC4; m16 & XmmReg ...; imm8 { XmmReg = pinsrw(XmmReg, m16, imm8:8); }
+:PINSRW        mmxreg, Rmr32, imm8 is vexMode=0 &  mandover=0 & byte=0x0F; byte=0xC4; mmxmod=3 & Rmr32 & mmxreg; imm8   { mmxreg = pinsrw(mmxreg, Rmr32, imm8:8); }
+:PINSRW        mmxreg, m16, imm8   is vexMode=0 &  mandover=0 & byte=0x0F; byte=0xC4; m16 & mmxreg ... ; imm8           { mmxreg = pinsrw(mmxreg, m16, imm8:8); }
+:PINSRW        XmmReg, Rmr32, imm8 is vexMode=0 &  $(PRE_66) & byte=0x0F; byte=0xC4; xmmmod=3 & Rmr32 & XmmReg; imm8    { XmmReg = pinsrw(XmmReg, Rmr32, imm8:8); }
+:PINSRW        XmmReg, m16, imm8   is vexMode=0 &  $(PRE_66) & byte=0x0F; byte=0xC4; m16 & XmmReg ...; imm8             { XmmReg = pinsrw(XmmReg, m16, imm8:8); }
 
 define pcodeop pmaddubsw;
 :PMADDUBSW     mmxreg, m64      is vexMode=0 &  mandover=0 & byte=0x0F; byte=0x38; byte=0x04; mmxreg ... & m64                          { mmxreg=pmaddubsw(mmxreg,m64); }
