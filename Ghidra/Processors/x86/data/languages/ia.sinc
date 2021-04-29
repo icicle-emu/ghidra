@@ -7283,16 +7283,17 @@ Order3: order3	is imm8 [ order3 = (((imm8 >> 6) & 0x3) << 5); ] { export *[const
 
 :PSHUFD         XmmReg1, m128, imm8     is vexMode=0 & $(PRE_66) & byte=0x0F; byte=0x70; (m128 & XmmReg1 ...); imm8 & Order0 & Order1 & Order2 & Order3
 {
-    shifted:16 = m128 >> Order0;   
+	local src = m128;
+    shifted:16 = src >> Order0;
     XmmReg1[0,32] = shifted:4;
     
-    shifted = m128 >> Order1;   
+    shifted = src >> Order1;
     XmmReg1[32,32] = shifted:4;
 
-    shifted = m128 >> Order2;   
+    shifted = src >> Order2;
     XmmReg1[64,32] = shifted:4;
 
-    shifted = m128 >> Order3;   
+    shifted = src >> Order3;
     XmmReg1[96,32] = shifted:4;
 }
 
