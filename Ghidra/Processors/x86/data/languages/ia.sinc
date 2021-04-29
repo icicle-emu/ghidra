@@ -3636,7 +3636,7 @@ define pcodeop smm_restore_state;
 :SBB  AX,imm16     is vexMode=0 & opsize=0 & byte=0x1d; AX & imm16						{ subCarryFlags( AX, imm16 ); resultflags(AX); }
 :SBB  EAX,imm32    is vexMode=0 & opsize=1 & byte=0x1d; EAX & check_EAX_dest & imm32	{ subCarryFlags( EAX, imm32 ); build check_EAX_dest; resultflags(EAX); }
 @ifdef IA64
-:SBB  RAX,imm32    is $(LONGMODE_ON) & vexMode=0 & opsize=2 & byte=0x1d; RAX & imm32						{ subCarryFlags( RAX, imm32 ); resultflags(RAX); }
+:SBB  RAX,simm32_64    is $(LONGMODE_ON) & vexMode=0 & opsize=2 & byte=0x1d; RAX & simm32_64						{ subCarryFlags( RAX, imm32 ); resultflags(RAX); }
 @endif
 :SBB  Rmr8,imm8     is vexMode=0 & $(BYTE_80_82); mod=3 & Rmr8 & reg_opcode=3; imm8								{ subCarryFlags( Rmr8, imm8 ); resultflags(Rmr8); }
 :SBB  Rmr16,imm16       is vexMode=0 & opsize=0 & byte=0x81; mod=3 & Rmr16 & reg_opcode=3; imm16							{ subCarryFlags( Rmr16, imm16 ); resultflags(Rmr16); }
