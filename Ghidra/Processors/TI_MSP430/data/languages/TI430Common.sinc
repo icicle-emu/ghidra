@@ -1102,7 +1102,7 @@ OFFSET_10BIT: offset10 is off16   [offset10 = inst_start + 2 + off16 * 2; ]
 :SBC^".B" DEST_B_AD is ctx_haveext=0 & (op16_12_4=0x7 & as=0x0 & src_Direct16_8_4=0x3 & bow=0x1 & tbl_bzero & postIncrementStore) ... & DEST_B_AD ... {
 	# Operation Flags...
 	brw:1 = 1 - $(CARRY);
-    $(CARRY) = (brw <= DEST_B_AD);             # Carry flag is NOT set if there is a borrow
+	$(CARRY) = (brw <= DEST_B_AD);             # Carry flag is NOT set if there is a borrow
 	$(OVERFLOW) = sborrow(DEST_B_AD, brw);	
 	# Operation...
 	DEST_B_AD = DEST_B_AD - brw;
@@ -1162,7 +1162,7 @@ OFFSET_10BIT: offset10 is off16   [offset10 = inst_start + 2 + off16 * 2; ]
 # Decrement word
 :DEC^".W" DEST_W_AD is ctx_haveext=0 & (op16_12_4=0x8 & as=0x1 & src_Direct16_8_4=0x3 & bow=0x0 & tbl_wzero & postIncrementStore) ... & DEST_W_AD ... {
 	# Operation Flags...
-	$(CARRY) = (0x0 == DEST_W_AD);			# C Flag
+	$(CARRY) = (0x1 <= DEST_W_AD);			# C Flag
 	$(OVERFLOW) = (0x8000 == DEST_W_AD);	# V Flag
 	# Operation...
 	DEST_W_AD = DEST_W_AD - 0x1;		
@@ -1176,7 +1176,7 @@ OFFSET_10BIT: offset10 is off16   [offset10 = inst_start + 2 + off16 * 2; ]
 # Decrement byte
 :DEC^".B" DEST_B_AD is ctx_haveext=0 & (op16_12_4=0x8 & as=0x1 & src_Direct16_8_4=0x3 & bow=0x1 & tbl_bzero & postIncrementStore) ... & DEST_B_AD ... {
 	# Operation Flags...
-	$(CARRY) = (0x0 == DEST_B_AD);			# C Flag
+	$(CARRY) = (0x1 <= DEST_B_AD);			# C Flag
 	$(OVERFLOW) = (0x80 == DEST_B_AD);		# V Flag
 	# Operation...
 	DEST_B_AD = DEST_B_AD - 0x1;		
@@ -1190,7 +1190,7 @@ OFFSET_10BIT: offset10 is off16   [offset10 = inst_start + 2 + off16 * 2; ]
 # Double decrement word
 :DECD^".W" DEST_W_AD is ctx_haveext=0 & (op16_12_4=0x8 & as=0x2 & src_Direct16_8_4=0x3 & bow=0x0 & tbl_wzero & postIncrementStore) ... & DEST_W_AD ... {
 	# Operation Flags...
-	$(CARRY) = ((0x0 == DEST_W_AD) || (0x1 == DEST_W_AD));			# C Flag
+	$(CARRY) = (0x2 <= DEST_W_AD);			# C Flag
 	$(OVERFLOW) = ((0x8000 == DEST_W_AD) || (0x8001 == DEST_W_AD));	# V Flag
 	# Operation...
 	DEST_W_AD = DEST_W_AD - 0x2;
@@ -1204,7 +1204,7 @@ OFFSET_10BIT: offset10 is off16   [offset10 = inst_start + 2 + off16 * 2; ]
 # Double decrement byte
 :DECD^".B" DEST_B_AD is ctx_haveext=0 & (op16_12_4=0x8 & as=0x2 & src_Direct16_8_4=0x3 & bow=0x1 & tbl_bzero & postIncrementStore) ... & DEST_B_AD ... {
 	# Operation Flags...
-	$(CARRY) = ((0x0 == DEST_B_AD) || (0x1 == DEST_B_AD));			# C Flag
+	$(CARRY) = (0x2 <= DEST_B_AD);			# C Flag
 	$(OVERFLOW) = ((0x80 == DEST_B_AD) || (0x81 == DEST_B_AD));		# V Flag
 	# Operation...
 	DEST_B_AD = DEST_B_AD - 0x2;
