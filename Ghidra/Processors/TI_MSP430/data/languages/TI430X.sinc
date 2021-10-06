@@ -5,7 +5,7 @@
 # The original way of using sub-tables to breakout the addressing modes does not
 # work for these instructions
 
-:^instruction							is opext_11_5=0x3 & ctx_haveext=0 & dest_0_4 & src_ext & al & zc & ad; instruction [ ctx_haveext=1; ctx_ctregdest=dest_0_4; ctx_regsrc=src_ext; ctx_al=al; ctx_num=ad; ] {$(CARRY)=$(CARRY) * (zc:1 == 0);  build instruction;}
+:^instruction							is opext_11_5=0x3 & ctx_haveext=0 & dest_0_4 & src_ext & al & zc & ad; instruction [ ctx_haveext=1; ctx_ctregdest=dest_0_4; ctx_regsrc=src_ext; ctx_al=al; ctx_num=ad; ctx_zc=zc; ] {$(CARRY)=$(CARRY) * (zc:1 == 0);  build instruction;}
 
 
 #:^instruction							is ctx_haveext=1 & instruction & as=1 & src_8_4=3 [ctx_haveext=2;] {build instruction;}
@@ -1298,14 +1298,6 @@ macro wzero(full, word)
 # double and single operand. The double operand ones come
 # first. A lot of the singles are covered under the address
 # extensions as they don't have the extension word.
-#
-# The manual talks about RRUX extended instructions.  However,
-# I've determined they don't really exist. First off, the base
-# RRU is not mentioned in the manual and is not in the toolchain.
-# The toolchain does take rrux instructions, but what I've figured
-# out is that for the W and A versions, it substitutes RRUM with 
-# the 'n' argument being 1. For the B version, it uses rra.b
-# followed by a bic.b instruction.
 #############################
 #
 # Double Operand
@@ -3259,7 +3251,7 @@ macro wzero(full, word)
 	goto <top>;
 }
 
-:RRCX.B XRREG_B_AS_DEST 		is ctx_haveext=4 & ctx_al=1 & op16_12_4=0x1 & op16_8_4=0x0 & bow=0x1 & postRegIncrement & XRREG_B_AS_DEST {
+:RRCX.B XRREG_B_AS_DEST 		is ctx_haveext=4 & ctx_al=1 & ctx_zc=0 & op16_12_4=0x1 & op16_8_4=0x0 & bow=0x1 & postRegIncrement & XRREG_B_AS_DEST {
 	<top>
 	# Operation Flags...
 	$(OVERFLOW) = ((XRREG_B_AS_DEST != 0x0) && ($(CARRY) == 0x1));	# V Flag
@@ -3276,7 +3268,21 @@ macro wzero(full, word)
 	goto <top>;
 }
 
-:RRCX.W XRREG_W_AS_DEST 		is ctx_haveext=4 & ctx_al=1 & op16_12_4=0x1 & op16_8_4=0x0 & bow=0x0 & postRegIncrement & XRREG_W_AS_DEST {
+:RRUX.B XRREG_B_AS_DEST 		is ctx_haveext=4 & ctx_al=1 & ctx_zc=1 & op16_12_4=0x1 & op16_8_4=0x0 & bow=0x1 & postRegIncrement & XRREG_B_AS_DEST {
+	$(OVERFLOW) = 0;					# Z Flag
+	<top>
+	$(CARRY) = (XRREG_B_AS_DEST & 0x1);
+	XRREG_B_AS_DEST = (XRREG_B_AS_DEST >> 0x1);
+	# Result Flags...
+	$(SIGN) = (XRREG_B_AS_DEST s< 0x0);			# S Flag
+	$(ZERO) = (XRREG_B_AS_DEST == 0x0);			# Z Flag
+	build postRegIncrement;
+	if (CNT == 0) goto inst_next;
+	CNT = CNT - 1;
+	goto <top>;
+}
+
+:RRCX.W XRREG_W_AS_DEST 		is ctx_haveext=4 & ctx_al=1 & ctx_zc=0 & op16_12_4=0x1 & op16_8_4=0x0 & bow=0x0 & postRegIncrement & XRREG_W_AS_DEST {
 	<top>
 	# Operation Flags...
 	$(OVERFLOW) = ((XRREG_W_AS_DEST != 0x0) && ($(CARRY) == 0x1));	# V Flag
@@ -3293,7 +3299,21 @@ macro wzero(full, word)
 	goto <top>;
 }
 
-:RRCX.A XRREG_A_AS_DEST 		is ctx_haveext=4 & ctx_al=0 & op16_12_4=0x1 & op16_8_4=0x0 & bow=0x1 & postRegIncrement & XRREG_A_AS_DEST {
+:RRUX.W XRREG_W_AS_DEST 		is ctx_haveext=4 & ctx_al=1 & ctx_zc=1 & op16_12_4=0x1 & op16_8_4=0x0 & bow=0x0 & postRegIncrement & XRREG_W_AS_DEST {
+	$(OVERFLOW) = 0;					# Z Flag
+	<top>
+	$(CARRY) = XRREG_W_AS_DEST[0,1];
+	XRREG_W_AS_DEST = (XRREG_W_AS_DEST >> 0x1);
+	# Result Flags...
+	$(SIGN) = (XRREG_W_AS_DEST s< 0x0);			# S Flag
+	$(ZERO) = (XRREG_W_AS_DEST == 0x0);			# Z Flag
+	build postRegIncrement;
+	if (CNT == 0) goto inst_next;
+	CNT = CNT - 1;
+	goto <top>;
+}
+
+:RRCX.A XRREG_A_AS_DEST 		is ctx_haveext=4 & ctx_al=0 & ctx_zc=0 & op16_12_4=0x1 & op16_8_4=0x0 & bow=0x1 & postRegIncrement & XRREG_A_AS_DEST {
 	<top>
 	# Operation Flags...
 	$(OVERFLOW) = ((XRREG_A_AS_DEST != 0x0) && ($(CARRY) == 0x1));	# V Flag
@@ -3302,6 +3322,20 @@ macro wzero(full, word)
 	$(CARRY) = XRREG_A_AS_DEST[0,1];
 	XRREG_A_AS_DEST = ((zext(tmp) << 0x13) | ((XRREG_A_AS_DEST >> 0x1) & 0xEFFFF));
 	XRREG_A_AS_DEST = sext(XRREG_A_AS_DEST[0,20]);
+	# Result Flags...
+	$(SIGN) = (XRREG_A_AS_DEST s< 0x0);			# S Flag
+	$(ZERO) = (XRREG_A_AS_DEST == 0x0);			# Z Flag
+	build postRegIncrement;
+	if (CNT == 0) goto inst_next;
+	CNT = CNT - 1;
+	goto <top>;
+}
+
+:RRUX.A XRREG_A_AS_DEST 		is ctx_haveext=4 & ctx_al=0 & ctx_zc=1 & op16_12_4=0x1 & op16_8_4=0x0 & bow=0x1 & postRegIncrement & XRREG_A_AS_DEST {
+	$(OVERFLOW) = 0;					# Z Flag
+	<top>
+	$(CARRY) = XRREG_A_AS_DEST[0,1];
+	XRREG_A_AS_DEST = (XRREG_A_AS_DEST >> 0x1) & 0xEFFFF;
 	# Result Flags...
 	$(SIGN) = (XRREG_A_AS_DEST s< 0x0);			# S Flag
 	$(ZERO) = (XRREG_A_AS_DEST == 0x0);			# Z Flag
