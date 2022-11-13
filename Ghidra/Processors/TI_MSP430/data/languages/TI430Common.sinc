@@ -247,10 +247,9 @@ define pcodeop bcd_add;		# Binary coded decimal (BCD) addition
 AMASK: val	is ctx_isHi=1 [ val = 0xFFFF; ]  { export *[const]:4 val; }
 AMASK: val	is ctx_isHi=0 [ val = 0xFFFFF; ] { export *[const]:4 val; }
 
-@define INDEX_BRANCH "0"
 
 macro computeIndexedAddr(ptr, reg, index) {
-@if INDEX_BRANCH == "1"
+@ifdef INDEX_BRANCH
 	local isHi = (reg & 0xF0000) != 0;
 	if (isHi) goto <hi>;
 	ptr = (reg + index) & 0xFFFF;
